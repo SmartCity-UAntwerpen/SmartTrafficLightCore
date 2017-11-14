@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="SmartTrafficLightCore" />
+        <module name="TrafficLightCore" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="SmartTrafficLightCore" target="1.8" />
+      <module name="TrafficLightCore" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

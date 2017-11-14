@@ -9,16 +9,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @SpringBootApplication(exclude = {EmbeddedServletContainerAutoConfiguration.class})
-public class SmartCarCoreApplication extends SpringBootServletInitializer
+public class TrafficLightCoreApplication extends SpringBootServletInitializer
 {
 	public static void main(String[] args)
 	{
-		SpringApplication.run(SmartCarCoreApplication.class, args);
+		SpringApplication.run(TrafficLightCoreApplication.class, args);
 	}
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder applicationBuilder)
 	{
-		return applicationBuilder.sources(SmartCarCoreApplication.class);
+		return applicationBuilder.sources(TrafficLightCoreApplication.class);
 	}
 }
