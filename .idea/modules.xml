@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TrafficLightCore.iml" filepath="$PROJECT_DIR$/TrafficLightCore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/TrafficLightCore.iml" filepath="$PROJECT_DIR$/.idea/TrafficLightCore.iml" />
     </modules>
   </component>
 </project>
