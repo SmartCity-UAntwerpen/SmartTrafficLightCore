@@ -6,7 +6,7 @@ import paho.mqtt.publish as publish
 
 class TrafficLight:
 
-    def __init__(self, id, location, driverHostname, port, settings, mqttClient, startState="OFF", redTime=7, greenTime=5, transTime=2):
+    def __init__(self, id, location, driverHostname, port, settings, mqttClient, startState="OFF", redTime=7, greenTime=5, transTime=5):
         # Init the state and behaviour of the light
         self.local_id = id
         self.location = location
@@ -43,16 +43,21 @@ class TrafficLight:
         if self.timer % self.redTime == 0 and self.state == "RED":
             self.prevState = self.state
             self.state = "TRANSITION"
+            self.timer = 0
+            self.updateState()
         elif self.timer % self.greenTime == 0 and self.state == "GREEN":
             self.prevState = self.state
             self.state = "TRANSITION"
+            self.timer = 0
+            self.updateState()
         elif self.timer % self.transitionTime == 0 and self.state == "TRANSITION":
+            self.timer = 0
             if self.prevState == "RED":
                 self.state = "GREEN"
             else:
                 self.state = "RED"
+            self.updateState()
 
-        self.updateState()
         self.timer += 1
 
     def updateState(self):
@@ -62,7 +67,8 @@ class TrafficLight:
             self.switchGreen()
         else:
             self.switchRed()
-        #Send update message to backend
+
+        # Send update message to backend
         self.mqttClient.publish("LIGHT/{}".format(self.id), self.state)
 
     def getState(self):

@@ -16,12 +16,16 @@ settings = {
     'mqtt_password': "smartcity",
 
     # Robot backend settings
-    'backend_ip' : "172.16.0.109",#"smartcity.ddns.net",
-    'backend_port' : "8083"
+    'backend_ip': "smartcity.ddns.net",
+    'backend_port': "8083"
 }
 
 
 def activate_terminal(backend):
+    """
+    Activate the terminal thread
+    :param backend: (crossing object) object containing all traffic lights
+    """
     def run_terminal():
         terminal = Terminal(backend)
         terminal.start()
@@ -44,7 +48,7 @@ if __name__ == "__main__":
     print("v0.0.1                                                                     ")
     mqttClient = MqttClient(settings)
     # Initialize models (hardcoded for now)
-    t1 = TrafficLight(1, 17, "172.16.0.200", 1315, settings, mqttClient, startState="RED", redTime=2, greenTime=1)
+    t1 = TrafficLight(1, 17, "172.16.0.200", 1315, settings, mqttClient, startState="RED", redTime=15, greenTime=10)
     #t2 = TrafficLight(2, 22, "172.16.0.200", 1315, settings, mqttClient, startState="GREEN", redTime=2, greenTime=1)
     models = Crossing({1: t1}) # , 2: t2})
     activate_terminal(models)

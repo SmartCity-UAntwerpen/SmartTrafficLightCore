@@ -8,19 +8,33 @@ class Crossing:
         self.globalTimer = None
 
     def start(self):
+        """
+        Starts the timer and activates the traffic lights
+        """
         for tlight in self.trafficLights:
             self.trafficLights[tlight].start()
         self.globalTimer = Timer(1, self.step)
         self.globalTimer.start()
 
     def reset(self):
+        """
+        Reset all trafficlights to their start state
+        :return:
+        """
         for tlight in self.trafficLights:
             self.trafficLights[tlight].reset()
 
     def stop(self, _id):
+        """
+        Stop a specific traffic light
+        :param _id: (int) local id
+        """
         self.trafficLights.get(int(_id)).stop()
 
     def kill(self):
+        """
+        Stops all traffic lights
+        """
         for tlight in self.trafficLights:
             self.trafficLights[tlight].stop()
 

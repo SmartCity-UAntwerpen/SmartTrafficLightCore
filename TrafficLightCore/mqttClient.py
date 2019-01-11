@@ -3,10 +3,10 @@ import paho.mqtt.client as mqtt
 class MqttClient:
 
     def __init__(self, settings):
-        user = {
-            'username': settings.get("mqtt_username"),
-            'password': settings.get("mqtt_password")
-        }
+        """
+        Start MQTT connection with provided settings
+        :param settings: mqtt settings
+        """
         self.client = mqtt.Client()
         self.client.username_pw_set(settings.get("mqtt_username"), settings.get("mqtt_password"))
         print("MQTT connecting...")
@@ -15,6 +15,11 @@ class MqttClient:
         self.client.loop_start()
 
     def publish(self, topic, message):
+        """
+        Publish a mqtt message
+        :param topic: (string) mqtt topic
+        :param message: (string)
+        """
         x = self.client.publish(topic, message, qos=2)
 
     def on_publish(self):
