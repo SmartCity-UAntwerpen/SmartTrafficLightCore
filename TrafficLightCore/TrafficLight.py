@@ -6,7 +6,7 @@ import paho.mqtt.publish as publish
 
 class TrafficLight:
 
-    def __init__(self, id, location, driverHostname, port, settings, mqttClient, startState="OFF", redTime=7, greenTime=5, transTime=5):
+    def __init__(self, id, location, settings, mqttClient, startState="OFF", redTime=7, greenTime=5, transTime=5):
         # Init the state and behaviour of the light
         self.local_id = id
         self.location = location
@@ -14,13 +14,10 @@ class TrafficLight:
         self.state = startState
         self.prevState = self.state
 
+        # Timings
         self.redTime = redTime
         self.greenTime = greenTime
         self.transitionTime = transTime
-
-        # Connection details
-        self.hostname = driverHostname
-        self.port = port
 
         # Create socket
         self.socket = 0
@@ -32,11 +29,15 @@ class TrafficLight:
         self.settings = settings
         # Initiate with the backend
         r = requests.get("http://{}:{}/tlight/initiate/{}/{}".format(settings.get("backend_ip"),settings.get("backend_port"),location,self.state))
-        print(r.content)
+        print("Trafficlight database id: {}".format(r.content))
         self.id = int(r.content)
         self.updateState()
 
     def step(self):
+        """
+        Progress the tf, timer increase and check the states, determines the next state
+        State chart: RED -> TRANSITION -> GREEN -> TRANSITION -> RED -> ...
+        """
         if not self.running:
             return
 
@@ -61,6 +62,10 @@ class TrafficLight:
         self.timer += 1
 
     def updateState(self):
+        """
+        Physically update the state and send MQTT state message
+        :return:
+        """
         if self.state == "RED":
             self.switchRed()
         elif self.state == "GREEN":
@@ -70,12 +75,6 @@ class TrafficLight:
 
         # Send update message to backend
         self.mqttClient.publish("LIGHT/{}".format(self.id), self.state)
-
-    def getState(self):
-        return self.state
-
-    def setState(self, state):
-        self.state = state
 
     def start(self):
         self.running = True
@@ -101,22 +100,37 @@ class TrafficLight:
         return
 
     def switchOff(self):
+        # Switch the light off
         self.send("LIGHT {} OFF".format(self.local_id))
         self.state = "OFF"
         return
 
     def send(self, message):
+        """
+        Send a message via tcp socket to tf driver
+        :param message: the status messages to update the light
+        """
         # Open socket for communication
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect((self.hostname, self.port))
+            self.socket.connect((self.settings.get("driver_host"), self.settings.get("driver_port")))
             self.socket.send(str.encode(message))
         except:
             print("Error trying to connect to traffic light driver")
         finally:
             self.socket.close()
 
+    def getState(self):
+        return self.state
+
+    def setState(self, state):
+        self.state = state
+
     def __del__(self):
+        """
+        Send delete request to robotBacked when tf is deleted
+        :return:
+        """
         r = requests.get(
             "http://{}:{}/tlight/delete/{}/".format(self.settings.get("backend_ip"), self.settings.get("backend_port"),
                                                     self.id))

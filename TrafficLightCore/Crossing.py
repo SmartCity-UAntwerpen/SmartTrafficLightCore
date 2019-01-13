@@ -42,12 +42,20 @@ class Crossing:
         return self.trafficLights.get(int(_id)).getState()
 
     def status(self):
+        """
+        Get the status of a all traffic light
+        :return: string with all trafficlight statuses
+        """
         res = ""
         for tlight in self.trafficLights:
             res += "Traffic light {} status: {}\n".format(self.trafficLights[tlight].id,self.trafficLights[tlight].getState())
         return res
 
     def step(self):
+        """
+        Time step, let the trafficlight progress step by step
+        This fucntion is periodically called every second
+        """
         for tlight in self.trafficLights:
             self.trafficLights[tlight].step()
         # Restart the timer
@@ -55,10 +63,18 @@ class Crossing:
         self.globalTimer.start()
 
     def manualState(self, tfid, state):
+        """
+        Manually overide a tf state
+        :param tfid: local tf id
+        :param state: desired state
+        """
         self.trafficLights.get(int(tfid)).setState(state)
         self.trafficLights.get(int(tfid)).updateState()
 
     def deleteAll(self):
+        """
+        Remove all traffic lights
+        """
         for tlight in self.trafficLights:
             del tlight
         del self.trafficLights

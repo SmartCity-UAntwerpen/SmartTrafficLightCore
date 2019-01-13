@@ -1,4 +1,4 @@
-
+import signal
 from threading import Thread
 from TrafficLightCore import RestAPI as REST
 from TrafficLightCore.Terminal import Terminal
@@ -10,28 +10,32 @@ models = None
 
 settings = {
     # MQTT settings
-    'mqtt_ip': "smartcity.ddns.net",
+    'mqtt_ip': "smartcity.ddns.net",  # "broker.mqttdashboard.com"
     'mqtt_port': 1883,
     'mqtt_username': "root",
     'mqtt_password': "smartcity",
 
     # Robot backend settings
     'backend_ip': "smartcity.ddns.net",
-    'backend_port': "8083"
+    'backend_port': "8083",
+
+    # Trafficlight driver
+    'driver_host' : "172.16.0.200",
+    'driver_port' : 1315
 }
 
 
-def activate_terminal(backend):
-    """
-    Activate the terminal thread
-    :param backend: (crossing object) object containing all traffic lights
-    """
-    def run_terminal():
-        terminal = Terminal(backend)
-        terminal.start()
+def service_shutdown(signum, frame):
+    print("Shutdown received")
+    raise ServiceExit
 
-    thread1 = Thread(target=run_terminal)
-    thread1.start()
+
+class ServiceExit(Exception):
+    """
+    Custom exception which is used to trigger the clean exit
+    of all running threads and the main program.
+    """
+    pass
 
 
 if __name__ == "__main__":
@@ -46,10 +50,26 @@ if __name__ == "__main__":
     print("                                                                           ")
     print("Universiteit Antwerpen - [2018-2019]                                       ")
     print("v0.0.1                                                                     ")
+
+    # Register the signal handlers
+    signal.signal(signal.SIGTERM, service_shutdown)
+    signal.signal(signal.SIGINT, service_shutdown)
+
     mqttClient = MqttClient(settings)
-    # Initialize models (hardcoded for now)
-    t1 = TrafficLight(1, 76, "172.16.0.200", 1315, settings, mqttClient, startState="RED", redTime=15, greenTime=10)
-    t2 = TrafficLight(2, 69, "172.16.0.200", 1315, settings, mqttClient, startState="GREEN", redTime=15, greenTime=10)
+    # Initialize traffic light models (hardcoded for now)
+    t1 = TrafficLight(1, 76, settings, mqttClient, startState="RED", redTime=15, greenTime=10)
+    t2 = TrafficLight(2, 69, settings, mqttClient, startState="GREEN", redTime=15, greenTime=10)
+
     models = Crossing({1: t1, 2: t2})
-    activate_terminal(models)
-    REST.RestApi(models)
+    terminal = Terminal(models)
+    try:
+        terminal.start()
+        REST.RestApi(models)
+
+    except ServiceExit:
+        # Terminate the running threads.
+        # Set the shutdown flag on each thread to trigger a clean shutdown of each thread.
+        terminal.shutdown_flag.set()
+        #terminal.join()
+        terminal.stop()
+        exit(1)

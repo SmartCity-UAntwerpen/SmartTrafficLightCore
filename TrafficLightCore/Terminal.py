@@ -1,14 +1,21 @@
-class Terminal:
+import os
+import signal
+import threading
 
-    def __init__(self,backend):
+
+class Terminal(threading.Thread):
+
+    def __init__(self, backend):
+        super().__init__()
         self.backend = backend
+        self.shutdown_flag = threading.Event()
 
-    def start(self):
+    def run(self):
 
         print("Starting default traffic light configuration")
 
         print("Type \"help\" for info about the commands")
-        while 1:
+        while not self.shutdown_flag.is_set():
             text = input("# ")
             if text == "exit":
                 self.stop()
@@ -48,4 +55,5 @@ class Terminal:
 
     def stop(self):
         self.backend.deleteAll()
-        quit()
+        self.shutdown_flag.set()
+        os.kill(os.getpid(), signal.SIGUSR1)
