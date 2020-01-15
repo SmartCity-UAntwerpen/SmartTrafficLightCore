@@ -13,6 +13,7 @@ class MqttClient:
         self.client.on_publish = self.on_publish
         self.client.connect(settings.get("mqtt_ip"), settings.get("mqtt_port"))
         self.client.loop_start()
+        self.client.on_message = self.on_message
 
     def publish(self, topic, message):
         """
@@ -25,4 +26,8 @@ class MqttClient:
     def on_publish(self):
         print("Message published!")
 
+    def on_message(self, topic, message):
+        print("Message received!: " +str(message)) # message.payload
 
+    def parse_message(self, message):
+        print("Message parsed!")

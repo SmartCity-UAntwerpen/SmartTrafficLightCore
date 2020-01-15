@@ -10,14 +10,18 @@ models = None
 
 settings = {
     # MQTT settings
-    'mqtt_ip': "smartcity.ddns.net",  # "broker.mqttdashboard.com"
+    'mqtt_ip': "localhost",  # "broker.mqttdashboard.com"
+    #'mqtt_ip': "smartcity.ddns.net",  # "broker.mqttdashboard.com"
     'mqtt_port': 1883,
-    'mqtt_username': "root",
+    'mqtt_username': "smartcity",
+    #'mqtt_username': "root",
     'mqtt_password': "smartcity",
 
     # Robot backend settings
-    'backend_ip': "smartcity.ddns.net",
-    'backend_port': "8083",
+    'backend_ip': "localhost",
+    #'backend_ip': "smartcity.ddns.net",
+    'backend_port': "1994",
+    #'backend_port': "8083",
 
     # Trafficlight driver
     'driver_host' : "172.16.0.200",

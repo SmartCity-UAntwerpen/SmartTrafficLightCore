@@ -2,8 +2,6 @@
 import socket
 import requests
 
-import paho.mqtt.publish as publish
-
 class TrafficLight:
 
     def __init__(self, id, location, settings, mqttClient, startState="OFF", redTime=7, greenTime=5, transTime=5):

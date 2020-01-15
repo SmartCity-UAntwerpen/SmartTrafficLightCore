@@ -1,7 +1,6 @@
 from flask import Flask, request
-import multiprocessing, json, threading
 
-app = Flask("DroneBackend")
+app = Flask("TrafficLightBackend")
 
 global_backend = None
 
@@ -10,7 +9,7 @@ class RestApi:
 
     def __init__(self, backend):
         if backend is not None:
-            global  global_backend
+            global global_backend
             global_backend = backend
             app.run()
         else:
